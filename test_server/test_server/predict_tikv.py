@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 import yaml
 import time
-from .tikv_prome import *
+from .prome import *
 from . import globalvar
 from math import ceil
 from sklearn.feature_selection import VarianceThreshold

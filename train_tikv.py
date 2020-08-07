@@ -10,6 +10,7 @@ from sklearn.linear_model import LogisticRegression
 import pandas as pd
 from itertools import chain
 from sklearn.linear_model import LassoCV
+from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
 minReplicas = 3
@@ -32,10 +33,12 @@ feature_inputs2 = [fetch_tikv_cpu_usage, fetch_tikv_grpc_poll_cpu, fetch_grpc_du
 feature_kinds = ['cpu', 'io util', 'io latency read', 'io latency write', 'grpc cpu', 'io bandwidth in',
                  'io bandwidth ', 'out', 'put', 'prewrite', 'commit', 'cop', 'get', 'scan']
 feature_kinds2 = ['cpu', 'grpc cpu', 'put', 'prewrite', 'commit', 'cop', 'get', 'scan']
+qps = []
+kinds = []
 to_drop = {}
 
 
-# 获取20份数据，每份20批
+# 获取50份数据，每份20批
 def get_train_data(batch_size, time_step, predict_step, input_size):
     train_x = np.empty([50, batch_size]).tolist()
     train_y = np.empty([50, batch_size]).tolist()
@@ -82,13 +85,22 @@ def feature_selection(df, train_y):
     ################
     # 数据预处理，特征选择
     global to_drop
-    # 去掉那些变化不大的特征
+    # 计算方差，去掉那些变化不大的特征
     variances = VarianceThreshold().fit(df).variances_.tolist()
     drop_variance = []
     for i in range(len(variances)):
         if variances[i] < 0.25:
             drop_variance.append(feature_kinds2[i])
     to_drop['variance'] = drop_variance
+
+    # 进行归一化，消除量纲
+    # print("Before normalization: ")
+    # print("df: ", df, "train_y: ", train_y)
+    # scaler = MinMaxScaler()
+    # train_x = scaler.fit_transform(df, train_y)
+    # df = pd.DataFrame(train_x, columns=feature_kinds2)
+    # print("After normalization: ")
+    # print("df: ", df, "train_y: ", train_y)
 
     # 计算Pearson相关系数，剔除相关性过高的特征
     coef = df.corr()
@@ -97,43 +109,43 @@ def feature_selection(df, train_y):
     drop_corr = [column for column in upper.columns if any(upper[column].abs() > correlation_threshold)]
     to_drop['corr'] = drop_corr
 
-    # 使用LightGBM剔除重要性为0的特征
-    features = pd.get_dummies(df)
-    feature_names = list(features)
-    features = np.array(features)
-    labels = np.array(train_y).reshape((-1,))
-    feature_importance_values = np.zeros(len(feature_names))
-    for iter in range(n_iterations):
-        model = lgb.LGBMClassifier(n_estimators=1000, learning_rate=0.05, verbose=-1)
-        print("Start lgbm fit ", iter, " times")
-        model.fit(features, labels.astype('int'))
+    # # 使用LightGBM剔除重要性为0的特征
+    # features = pd.get_dummies(df)
+    # feature_names = list(features)
+    # features = np.array(features)
+    # labels = np.array(train_y).reshape((-1,))
+    # feature_importance_values = np.zeros(len(feature_names))
+    # for iter in range(n_iterations):
+    #     model = lgb.LGBMClassifier(n_estimators=1000, learning_rate=0.05, verbose=-1)
+    #     print("Start lgbm fit ", iter, " times")
+    #     model.fit(features, labels.astype('int'))
 
-        # 记录特征的重要性
-        feature_importance_values += model.feature_importances_ / n_iterations
+    #     # 记录特征的重要性
+    #     feature_importance_values += model.feature_importances_ / n_iterations
+    #
+    # feature_importances = pd.DataFrame({'feature': feature_names, 'importance': feature_importance_values})
+    #
+    # # 根据重要性对特征进行排序
+    # feature_importances = feature_importances.sort_values('importance', ascending=False).reset_index(
+    #     drop=True)
+    #
+    # # 将重要性标准化
+    # feature_importances['normalized_importance'] = feature_importances['importance'] / feature_importances[
+    #     'importance'].sum()
+    # feature_importances['cumulative_importance'] = np.cumsum(feature_importances['normalized_importance'])
 
-    feature_importances = pd.DataFrame({'feature': feature_names, 'importance': feature_importance_values})
-
-    # 根据重要性对特征进行排序
-    feature_importances = feature_importances.sort_values('importance', ascending=False).reset_index(
-        drop=True)
-
-    # 将重要性标准化
-    feature_importances['normalized_importance'] = feature_importances['importance'] / feature_importances[
-        'importance'].sum()
-    feature_importances['cumulative_importance'] = np.cumsum(feature_importances['normalized_importance'])
-
-    # 提取重要性为0的特征
-    record_zero_importance = feature_importances[feature_importances['importance'] == 0.0]
-
-    drop_importance_zero = list(record_zero_importance['feature'])
-    to_drop['importance_zero'] = drop_importance_zero
-    print("lightgbm finished.")
-
-    # 剔除那些重要性小的特征
-    feature_importances = feature_importances.sort_values('cumulative_importance')
-    record_low_importance = feature_importances[feature_importances['cumulative_importance'] > cumulative_importance]
-    drop_importance_low = list(record_low_importance['feature'])
-    to_drop['importance_low'] = drop_importance_low
+    # # 提取重要性为0的特征
+    # record_zero_importance = feature_importances[feature_importances['importance'] == 0.0]
+    #
+    # drop_importance_zero = list(record_zero_importance['feature'])
+    # to_drop['importance_zero'] = drop_importance_zero
+    # print("lightgbm finished.")
+    #
+    # # 剔除那些重要性小的特征
+    # feature_importances = feature_importances.sort_values('cumulative_importance')
+    # record_low_importance = feature_importances[feature_importances['cumulative_importance'] > cumulative_importance]
+    # drop_importance_low = list(record_low_importance['feature'])
+    # to_drop['importance_low'] = drop_importance_low
 
     # L1正则化
     labels = np.array(train_y).reshape((-1,))
@@ -157,6 +169,19 @@ def feature_selection(df, train_y):
 
     print("Selected features.")
     return features_to_drop
+
+
+# 根据得到的qps对负载进行分类
+def workload_kinds(qps):
+    for i in range(len(qps)):
+        if qps[i] < 1000:
+            kinds[i][1] = 1
+        elif 4000 > qps[i] > 2000:
+            kinds[i][2] = 1
+        elif 8000 > qps[i] > 6000:
+            kinds[i][3] = 1
+        elif 40000 > qps[i] > 20000:
+            kinds[i][0] = 1
 
 
 # ——————————————————定义网络——————————————————
@@ -183,8 +208,10 @@ def lstm(X, weights, biases, input_size, rnn_unit, kp):
     ###########
     # 输出隐藏层
     ###########
-    output = tf.unstack(tf.transpose(output_rnn, [1, 0, 2]))
-    results = tf.matmul(output[-1], weights['out']) + weights['out']
+    output = tf.reshape(output_rnn, [-1, rnn_unit])  # 作为输出层的输入
+    index = tf.range(0, batch_size) * time_step + (time_step - 1)  # 只取最后的输出
+    output = tf.gather(output, index)  # 按照index取数据
+    results = tf.matmul(output, weights['out']) + biases['out']
     results = tf.nn.dropout(results, keep_prob=kp)
 
     return results
@@ -198,6 +225,7 @@ def train_lstm(input_size, output_size, lr, rnn_unit, weights, biases, time_step
     Y = tf.placeholder(tf.float32, shape=[None, output_size])
     keep_prob = tf.placeholder('float')
     pred = lstm(X, weights, biases, input_size, rnn_unit, keep_prob)
+    print("pred: ", pred.shape)
     # 损失函数, 最小二乘法
     loss = tf.reduce_mean(tf.square(tf.reshape(pred, [-1, output_size]) - tf.reshape(Y, [-1, output_size])))
     train_op = tf.train.AdamOptimizer(lr).minimize(loss)
@@ -210,7 +238,8 @@ def train_lstm(input_size, output_size, lr, rnn_unit, weights, biases, time_step
         for i in range(len(train_y)):
             batch_x = train_x[i]
             batch_y = train_y[i]
-
+            print("batch_x: ", np.array(batch_x).shape)
+            print("baych_y: ", np.array(batch_y).shape)
             _, loss_ = sess.run([train_op, loss], feed_dict={X: batch_x, Y: batch_y, keep_prob: kp})
             print(i, loss_)
 
@@ -275,7 +304,13 @@ def start_train_cpu():
     train_y0 = np.reshape(train_y0, (-1, output_size))
 
     df = pd.DataFrame(train_x0.tolist(), columns=feature_kinds2)
+    for _ in range(len(train_x0)):
+        # read, scan, update, insert
+        kind = [0, 0, 0, 0]
+        kinds.append(kind)
+
     features_to_drop = feature_selection(df, train_y0)
+    # workload_kinds(df)
 
     print(features_to_drop)
     train_x = np.array(train_x)
@@ -283,7 +318,8 @@ def start_train_cpu():
     df = pd.DataFrame(train_x.tolist(), columns=feature_kinds2)
     df.drop(columns=features_to_drop)
     train_x = df.to_numpy()
-    train_x = np.reshape(train_x, (-1, batch_size, time_step, input_size - len(features_to_drop)))
+    input_size = input_size - len(features_to_drop)
+    train_x = np.reshape(train_x, (-1, batch_size, time_step, input_size))
     train_x = train_x.tolist()
 
     # ——————————————————定义神经网络变量——————————————————
