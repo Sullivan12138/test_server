@@ -4,7 +4,7 @@ import time
 
 url = 'http://10.233.28.181:2379/pd/api/v1/regions'
 prome_addr = '10.233.18.170:9090'
-dir = 'data/'
+dirname = 'data/requests/'
 
 
 def fetch_request(prome_addr, start, end, step=30):
@@ -19,24 +19,16 @@ def fetch_request(prome_addr, start, end, step=30):
     return res['data']['result']
 
 
-filename = 'requests.log'
-print(filename)
 i = 0
-with open(dir + filename, 'a+') as f:
-    while i < 1200:
-        try:
-            # res = requests.get(url)#获取训练集
-            end = str(int(time.time()))
-            start = end
-            res = fetch_request(prome_addr, start, end, 60)
-            sum = 0
-            for metric in res:
-                sum += metric['values'][-1][1]
-            f.write(str(sum))
-            time.sleep(60)
-            i += 1
-        except:
-            print('request url error')
-            time.sleep(60)
-            i += 1
+while i < 1200:
+    end = str(int(time.time()))
+    start = end
+    filename = end + '.log'
+    f = open(dirname + filename, 'w')
+    f.close()
+    with open(dirname + filename, 'a+') as f:
+        res = fetch_request(prome_addr, start, end, 60)
+        json.dump(res, f, indent=4)
+    i += 1
+    time.sleep(60)
 

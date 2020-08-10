@@ -8,19 +8,56 @@ import tensorflow as tf
 from sklearn.metrics import *
 from math import sqrt
 import time
+from os import listdir
+import json
 import csv
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-from train import lstm
 
-
-def read_file(filename):
+def read_file(dirname):
     request_data = []
-    with open(filename, 'r') as f:
-        for line in f.readlines():
-            request_data.append(line.strip('\n'))
+    files  = listdir(dirname)
+    for file in files:
+        load_dict = json.load(file)
+        request_data.append(load_dict)
     return request_data
+
+
+def sumup(input_data):
+    sum_data = []
+    for data in input_data:
+        sum = 0
+        for metric in data:
+            sum += metric['values'][-1][1]
+            sum_data.append(sum)
+    return sum_data
+
+
+def command_kinds(input_data, sum_data):
+    portions = []
+    for i in range(len(input_data)):
+        data = input_data[i]
+        sum = sum_data[i]
+        portion = [0., 0., 0., 0.]
+        for metric in data:
+            if metric['type'] == 'Get':
+                portion[0] = float(metric['values'][-1][1] / sum)
+            elif metric['type'] == 'Commit':
+                portion[1] = float(metric['values'][-1][1] / sum)
+            elif metric['type'] == 'Scan':
+                portion[2] = float(metric['values'][-1][1] / sum)
+            elif metric['type'] == 'Prewrite':
+                portion[3] = float(metric['values'][-1][1] / sum)
+        portions.append(portion)
+    return portions
+
+
+def cal_weights(sum_data, portions, weights):
+    for i in range(len(sum_data)):
+        sum_data[i] = sum_data[i] * (portions[i][0] * weights[0] + portions[i][1] * weights[1] + portions[i][2] *
+                                     weights[2] + portions[i][3] * weights[3])
+    return sum_data
 
 
 #获取训练集
@@ -67,6 +104,34 @@ def get_test_data(data,time_step,test_begin,predict_step):
     #print(np.array(test_y))
 
     return maxvalue,mean,std,test_x,test_y
+
+
+#——————————————————定义网络——————————————————
+def lstm(X,weights,biases,input_size,rnn_unit,keep_prob):
+    # X是一个三维tensor
+    batch_size=tf.shape(X)[0]
+    time_step=tf.shape(X)[1]
+    w_in=weights['in']
+    b_in=biases['in']
+
+    input=tf.reshape(X,[-1,input_size])  #需要将tensor转成2维进行计算，计算后的结果作为隐藏层的输入
+    input_rnn=tf.matmul(input,w_in)+b_in
+    input_rnn=tf.reshape(input_rnn,[-1,time_step,rnn_unit])  #将tensor转成3维，作为lstm cell的输入
+    cell = tf.nn.rnn_cell.BasicLSTMCell(rnn_unit) # reuse = sign
+    init_state=cell.zero_state(batch_size,dtype=tf.float32)
+    output_rnn,final_states=tf.nn.dynamic_rnn(cell, input_rnn,initial_state=init_state, dtype=tf.float32)  #output_rnn是记录lstm每个输出节点的结果，final_states是最后一个cell的结果
+    # output_rnn是一个tensor，维度和input_rnn一样
+    m = output_rnn
+    output=tf.reshape(output_rnn,[-1,rnn_unit]) #作为输出层的输入
+    index = tf.range(0, batch_size) * time_step + (time_step - 1) #只取最后的输出
+    output = tf.gather(output , index)#按照index取数据
+    mm = output
+    w_out=weights['out']
+    b_out=biases['out']
+    pred0=tf.matmul(output,w_out)+b_out
+    pred = tf.nn.dropout(pred0, keep_prob)
+    return pred,final_states,m,mm
+
 
 #——————————————————训练模型—————————————————
 def train_lstm(data,input_size,output_size,lr,train_time,rnn_unit,weights,biases,train_end,
@@ -172,6 +237,10 @@ def train_lstm(data,input_size,output_size,lr,train_time,rnn_unit,weights,biases
         plt.show()
 
 
+# if __name__ == "__main__":
+#     data = read_file("./data/requests.log")
+#     print(data)
+
 if __name__=="__main__":
     input_size = 1  # 输入维度
     output_size = 1  # 输出维度
@@ -184,17 +253,22 @@ if __name__=="__main__":
     smooth = 0  # 为1则在时间维度上平滑数据
     train_time = 50  # 所有数据的训练轮次
     train_end = 900  # 训练集截取到的位置
-    filename = './data/requests.log'
+    weights = [1, 1, 1, 1] # read, update, scan, insert
+    dir_name = 'data/requests'
     save_model_path = './save/requests/'  # checkpoint存在的目录
     save_model_name = 'MyModel'    #saver.save(sess, './save/MyModel') 保存模型
 
-    data = read_file(filename)
+    input_data = read_file(dir_name)
+    sum_data = sumup(input_data)
+    # portions = command_kinds(input_data, sum_data)
+    # sum_data = (sum_data, portions, weights)
+
 
     if smooth == 1:  # 平滑数据
-        newdata = data
-        for i in range(2, len(data) - 2):
+        newdata = sum_data
+        for i in range(2, len(sum_data) - 2):
             for j in range(input_size * 2):
-                newdata[i][j] = (data[i - 2][j] + data[i - 1][j] + data[i][j] + data[i + 1][j] + data[i + 2][j]) / 5
+                newdata[i][j] = (sum_data[i - 2][j] + sum_data[i - 1][j] + sum_data[i][j] + sum_data[i + 1][j] + sum_data[i + 2][j]) / 5
         data = newdata
 
     # ——————————————————定义神经网络变量——————————————————
