@@ -9,8 +9,8 @@ dirname = 'data/requests/'
 
 def fetch_request(prome_addr, start, end, step=30):
     r = requests.get(
-        'http://%s/api/v1/query_range?query=sum(rate(tidb_tikvclient_request_seconds_count[1m])) by (instance, '
-        'type)&start=%s&end=%s&step=%s' % (
+        'http://%s/api/v1/query_range?query=sum(rate(tikv_grpc_msg_duration_seconds_count{'
+        'type!="kv_gc"}[1m])) by (instance,type)&start=%s&end=%s&step=%s' % (
             prome_addr, start, end, step))
     res = r.json()
     if res['status'] == 'error':

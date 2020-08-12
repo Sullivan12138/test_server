@@ -15,6 +15,14 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
 
+record_per_cop = 2788.84
+record_per_read_get = 2052.79
+record_per_txn = 128937.19
+record_per_insert_prewrite = 4794.52
+get_per_txn = 8.66
+prewrite_per_txn = 6.45
+
+
 def read_file(dirname):
     request_data = []
     files  = listdir(dirname)
@@ -41,15 +49,29 @@ def command_kinds(input_data, sum_data):
         sum = sum_data[i]
         portion = [0., 0., 0., 0.]
         for metric in data:
-            if metric['type'] == 'Get':
-                portion[0] = float(metric['values'][-1][1] / sum)
-            elif metric['type'] == 'Commit':
-                portion[1] = float(metric['values'][-1][1] / sum)
-            elif metric['type'] == 'Scan':
-                portion[2] = float(metric['values'][-1][1] / sum)
-            elif metric['type'] == 'Prewrite':
-                portion[3] = float(metric['values'][-1][1] / sum)
-        portions.append(portion)
+            if metric['values'][-1][1] <= 10.:
+                metric['values'][-1][1] = 0.
+            txn_qps, get_qps, cop_qps, pre_qps = 0., 0., 0., 0.
+            if metric['type'] == 'kv_check_txn_status':
+                txn_qps = metric['values'][-1][1]
+            elif metric['type'] == 'kv_get':
+                get_qps = metric['values'][-1][1]
+            elif metric['type'] == 'kv_coprocessor':
+                cop_qps = metric['values'][-1][1]
+            elif metric['type'] == 'kv_prewrite':
+                pre_qps = metric['values'][-1][1]
+            record_update = txn_qps * record_per_txn
+            read_get_qps = get_qps - txn_qps * get_per_txn
+            record_read = read_get_qps * record_per_read_get
+            record_scan = cop_qps * record_per_cop
+            insert_pre_qps = pre_qps - txn_qps * prewrite_per_txn
+            record_insert = insert_pre_qps * record_per_insert_prewrite
+            record_sum = record_read + record_insert + record_scan + record_update
+            portion[0] = record_read / record_sum
+            portion[1] = record_update / record_sum
+            portion[2] = record_scan / record_sum
+            portion[3] = record_insert / record_sum
+            portions.append(portion)
     return portions
 
 
@@ -269,7 +291,7 @@ if __name__=="__main__":
         for i in range(2, len(sum_data) - 2):
             for j in range(input_size * 2):
                 newdata[i][j] = (sum_data[i - 2][j] + sum_data[i - 1][j] + sum_data[i][j] + sum_data[i + 1][j] + sum_data[i + 2][j]) / 5
-        data = newdata
+        sum_data = newdata
 
     # ——————————————————定义神经网络变量——————————————————
     # 输入层、输出层权重、偏置
@@ -293,6 +315,6 @@ if __name__=="__main__":
         'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
     }
     t0 = time.time()
-    train_lstm(data,input_size,output_size,lr,train_time,rnn_unit,weights,biases,train_end,batch_size,time_step,kp)
+    train_lstm(sum_data,input_size,output_size,lr,train_time,rnn_unit,weights,biases,train_end,batch_size,time_step,kp)
     t1 = time.time()
     print("时间:%.4fs" % (t1 - t0))

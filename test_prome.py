@@ -4,15 +4,7 @@ import requests
 import time
 
 
-def fetch_tikv_cpu_usage(prome_addr, start, end, step=30):
-    r = requests.get(
-        'http://%s/api/v1/query_range?query=sum(rate(tikv_thread_cpu_seconds_total[1m])) by (instance)&start=%s&end=%s&step=%s' % (
-            prome_addr, start, end, step))
-    res = r.json()
-    if res['status'] == 'error':
-        raise Exception(
-            'an error occurred when fetching tikv cpu usage: errorType={}: {}'.format(res['errorType'], res['error']))
-    return res['data']['result']
+
 
 
 def fetch_tikv_grpc_poll_cpu(prome_addr, start, end, step=30):
@@ -95,11 +87,19 @@ def fetch_grpc_duration_scan(prome_addr, start, end, step=30):
     return scan_metric
 
 
-def fetch_request(prome_addr, start, end, step=30):
+def fetch_tikv_cpu_usage(prome_addr, start, end, step=30):
     r = requests.get(
-        'http://%s/api/v1/query_range?query=sum(rate(tidb_tikvclient_request_seconds_count[1m])) by (instance, '
-        'type)&start=%s&end=%s&step=%s' % (
+        'http://%s/api/v1/query_range?query=sum(rate(tikv_thread_cpu_seconds_total[1m])) by (instance)&start=%s&end=%s&step=%s' % (
             prome_addr, start, end, step))
+    res = r.json()
+    if res['status'] == 'error':
+        raise Exception(
+            'an error occurred when fetching tikv cpu usage: errorType={}: {}'.format(res['errorType'], res['error']))
+    return res['data']['result']
+
+
+def fetch_request(prome_addr, start, end, step=30):
+    r = requests.get('http://%s/api/v1/query_range?query=sum(rate(tikv_grpc_msg_duration_seconds_count{type!="kv_gc"}[1m])) by (instance,type)&start=%s&end=%s&step=%s' % (prome_addr, start, end, step))
     res = r.json()
     if res['status'] == 'error':
         raise Exception(
@@ -108,13 +108,13 @@ def fetch_request(prome_addr, start, end, step=30):
 
 
 prome_addr = '10.233.18.170:9090'
-start = str(int(time.time()))
+start = str(int(time.time())-60)
 end = str(int(time.time()))
 step = 60
-requests = fetch_request(prome_addr, start, end, step)
-print("requests: ", requests)
-# cpudata = fetch_tikv_cpu_usage(prome_addr, start, end, step)
-# print("cpudata: ", cpudata)
+request_data = fetch_request(prome_addr, start, end, step)
+print("requests: ", request_data)
+cpudata = fetch_tikv_cpu_usage(prome_addr, start, end, step)
+print("cpudata: ", cpudata)
 # io_util = fetch_disk_io_util(prome_addr, start, end, step)
 # print("io_util: ", io_util)
 # read_latency = fetch_tikv_disk_read_latency(prome_addr, start, end, step)
