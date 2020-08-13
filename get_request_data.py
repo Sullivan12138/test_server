@@ -20,8 +20,9 @@ def fetch_request(prome_addr, start, end, step=30):
     return res['data']['result']
 
 
+get_data_duration = int(sys.argv[1])
 i = 0
-while i < 1200:
+while i < get_data_duration:
     end = str(int(time.time()))
     start = end
     filename = end + '.log'
