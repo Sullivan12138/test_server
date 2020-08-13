@@ -10,6 +10,7 @@ from math import sqrt
 import time
 from os import listdir
 import json
+import sys
 import csv
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
@@ -274,7 +275,6 @@ if __name__=="__main__":
     kp = 1  # dropout保留节点的比例
     smooth = 0  # 为1则在时间维度上平滑数据
     train_time = 50  # 所有数据的训练轮次
-    train_end = 900  # 训练集截取到的位置
     weights = [1, 1, 1, 1] # read, update, scan, insert
     dir_name = 'data/requests'
     save_model_path = './save/requests/'  # checkpoint存在的目录
@@ -285,6 +285,10 @@ if __name__=="__main__":
     # portions = command_kinds(input_data, sum_data)
     # sum_data = (sum_data, portions, weights)
 
+
+    period_duration = sys.argv[1]
+    train_period = sys.argv[2]
+    train_end = train_period * period_duration
 
     if smooth == 1:  # 平滑数据
         newdata = sum_data
