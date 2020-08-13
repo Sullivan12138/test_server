@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import sys
 
 url = 'http://10.233.28.181:2379/pd/api/v1/regions'
 prome_addr = '10.233.18.170:9090'
