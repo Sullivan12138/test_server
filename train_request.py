@@ -27,7 +27,9 @@ def read_file(dirname):
     request_data = []
     files = listdir(dirname)
     for file in files:
-        load_dict = json.load(file)
+        f = open(file, 'r')
+        load_dict = json.load(f)
+        f.close()
         request_data.append(load_dict)
     return request_data
 
