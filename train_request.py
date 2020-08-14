@@ -44,6 +44,10 @@ def sumup(input_data):
     return sum_data
 
 
+def hello():
+    print("hello")
+    
+    
 def command_kinds(input_data, sum_data):
     portions = []
     for i in range(len(input_data)):
