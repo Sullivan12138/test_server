@@ -23,7 +23,6 @@ get_per_txn = 8.66
 prewrite_per_txn = 6.45
 
 
-# eqwrqere
 def read_file(dirname):
     request_data = []
     files = listdir(dirname)
