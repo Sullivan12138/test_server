@@ -1,3 +1,8 @@
+"""
+这里包含从prometheus获取各种metrics的方法
+和特征选择那一版本的预测代码相配合，目前没有用
+"""
+
 import requests
 
 

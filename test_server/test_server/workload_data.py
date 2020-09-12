@@ -1,7 +1,11 @@
+"""
+这个文件的作用是从prometheus获取数据并保存到文件
+同时提供读取文件的接口
+"""
 import time
 import json
 import sys
-from fetch_prome_metrics import *
+from .fetch_prome_metrics import *
 from os import listdir
 
 dir_name_statement_ops = './data/statement_ops/'

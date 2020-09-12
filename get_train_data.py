@@ -1,7 +1,10 @@
+"""
+特征选择那个版本的输入获取代码，目前没有用
+"""
 import datetime
 import time
 
-from test_server.test_server.tikv_prome import *
+from tikv_prome import *
 
 
 feature_inputs = [fetch_tikv_cpu_usage, fetch_io_utilization, fetch_disk_latency,

@@ -1,12 +1,14 @@
 """
-预测数据,多维单步，预测几步后的那一时刻输出
+用于训练模型的代码
+训练ops
+训练完了以后保存模型
 """
 import tensorflow as tf
 import numpy as np
 import time
 import sys
-from workload_data import load_history_workload
-from variables import *
+from .workload_data import load_history_workload
+from .variables import *
 import json
 
 
@@ -156,12 +158,12 @@ def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, weights,
             print('No Model')
 
         # 重复训练
-        for i in range(train_time):
+        for _ in range(train_time):
             for step in range(len(batch_index) - 1):
-                _, loss_, M, MM = sess.run([train_op, loss, m, mm],
-                                           feed_dict={X: train_x[batch_index[step]:batch_index[step + 1]],
-                                                      Y: train_y[batch_index[step]:batch_index[step + 1]],
-                                                      keep_prob: kp})
+                sess.run([train_op, loss, m, mm],
+                            feed_dict={X: train_x[batch_index[step]:batch_index[step + 1]],
+                            Y: train_y[batch_index[step]:batch_index[step + 1]],
+                            keep_prob: kp})
 
         test_begin = 0
         test_end = len(data)

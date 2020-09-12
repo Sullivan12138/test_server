@@ -1,5 +1,9 @@
-import requests
+"""
+从prometheus获取metrics的方法
+目前版本的预测代码使用这些metrics
+"""
 
+import requests
 addr = '10.233.18.170:9090'
 
 

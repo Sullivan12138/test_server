@@ -1,3 +1,7 @@
+"""
+这里面包含的是django传给网络接口的数据
+"""
+
 class GlobalVar:
     predict_regions = {
         'time': 0,

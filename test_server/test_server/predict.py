@@ -1,13 +1,19 @@
+"""
+用于预测的代码
+目前还没有实现同时预测cpu usage和ops的功能
+同时预测似乎也没有什么用
+"""
 import numpy as np
 import yaml
 import time
-from fetch_prome_metrics import *
-from variables import *
-from train import lstm
+from .fetch_prome_metrics import *
+from .variables import *
+from .train import lstm
 import sys
 import threading
-from train import weights, biases
-from train_cpu_usage import weights_cpu, biases_cpu
+from .train import weights, biases
+# from .train_cpu_usage import weights_cpu, biases_cpu
+from .globalvar import get_tikv_replicas
 import tensorflow as tf
 
 
@@ -167,7 +173,7 @@ def predict(test_x, save_model_path, weights, biases):
     saver = tf.train.Saver(max_to_keep=1)
     with tf.Session() as sess:
         ckpt = tf.train.get_checkpoint_state(save_model_path)
-        if ckpt and ckpt.model_checkpoint_path:
+        if ckpt and ckpt.model_checkpoint_path: # 此处pylint报错：ckpt没有model_checkpoint_path，但是代码依然能正常运行
             saver.restore(sess, ckpt.model_checkpoint_path)
             print('Model Restored.')
         else:
@@ -244,10 +250,12 @@ def predict(test_x, save_model_path, weights, biases):
 #             return None
 
 
-if __name__ == '__main__':
+def start_predict(name, namespace, predict_duration):
     init_tikv_replicas = yaml_to_dict(yaml_path) # 从yaml文件中取出当前的tikv副本数目
+    refer_data = get_tikv_replicas()
+    refer_data['name'] = name
+    refer_data['namespace'] = namespace
 
-    predict_duration = int(sys.argv[1])
     j = 0
     while j < predict_duration: # 每一分钟都进行一次预测
         test_x, mean_x, std_x = get_test_data()
@@ -285,5 +293,6 @@ if __name__ == '__main__':
                 predict_replicas = init_tikv_replicas + 1
         else:
             predict_replicas = expected_tikv_replicas
+        refer_data['replicas'] = predict_replicas
         j += 1
         time.sleep(60)

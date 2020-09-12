@@ -1,3 +1,6 @@
+"""
+这个文件用于测试从prometheus获取metrics的方法是否正确
+"""
 from typing import Any, Callable
 
 import requests

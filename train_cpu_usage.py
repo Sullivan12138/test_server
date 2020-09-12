@@ -1,8 +1,13 @@
+"""
+训练的代码，用于训练cpu usage
+训练完了以后保存模型
+目前没有用
+"""
 import time
 import sys
-from variables import *
-from train import train_lstm
-from workload_data import load_history_workload
+from test_server.test_server.variables import *
+from test_server.test_server.train import train_lstm
+from test_server.test_server.workload_data import load_history_workload
 import tensorflow as tf
 
 weights_cpu = {

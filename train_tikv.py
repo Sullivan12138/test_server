@@ -1,6 +1,10 @@
+"""
+包含特征选择那一版本的预测代码，目前没有用
+"""
+
 import numpy as np
 import tensorflow as tf
-from test_server.test_server.tikv_prome import *
+from tikv_prome import *
 from sklearn.feature_selection import VarianceThreshold
 import lightgbm as lgb
 from sklearn.feature_selection import SelectFromModel
