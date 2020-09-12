@@ -2,13 +2,21 @@
   <dictionary name="taowei">
     <words>
       <w>ckpt</w>
+      <w>coef</w>
       <w>grpc</w>
       <w>hust</w>
+      <w>importances</w>
       <w>kubectl</w>
+      <w>lassocv</w>
+      <w>lgbm</w>
+      <w>lightgbm</w>
       <w>lstm</w>
+      <w>maxscanlength</w>
       <w>mins</w>
+      <w>prewrite</w>
       <w>prome</w>
       <w>pythonpath</w>
+      <w>raftstore</w>
       <w>readlines</w>
       <w>regularizer</w>
       <w>scaler</w>

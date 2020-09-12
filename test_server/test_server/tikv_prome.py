@@ -25,10 +25,25 @@ def fetch_tikv_grpc_poll_cpu(prome_addr, start, end, step=30):
     return res['data']['result']
 
 
-def fetch_grpc_duration(prome_addr, start, end, step=30):
+def fetch_tikv_rocksdb_cpu(prome_addr, start, end, step=30):
     r = requests.get(
-        'http://%s/api/v1/query_range?query=sum(rate(tikv_grpc_msg_duration_seconds_sum['
-        '1m])) by (type) / sum(rate(tikv_grpc_msg_duration_seconds_count[1m])) by (type)&start=%s&end=%s&step=%s' %
+        'http://%s/api/v1/query_range?query=sum(rate(tikv_thread_cpu_seconds_total{name=~"rocksdb.*"}[1m])) by (instance)&start=%s&end=%s&step=%s' % (prome_addr, start, end, step))
+    res = r.json()
+    if res['status'] == 'error':
+        raise Exception(
+            'an error occurred when fetching tikv grpc poll cpu: errorType={}: {}'.format(res['errorType'], res['error'])
+        )
+    return res['data']['result']
+
+
+def fetch_grpc_duration(prome_addr, start, end, step=30):
+    # r = requests.get(
+    #     'http://%s/api/v1/query_range?query=sum(rate(tikv_grpc_msg_duration_seconds_sum['
+    #     '1m])) by (type) / sum(rate(tikv_grpc_msg_duration_seconds_count[1m])) by (type)&start=%s&end=%s&step=%s' %
+    #     (prome_addr, start, end, step))
+    r = requests.get(
+        'http://%s/api/v1/query_range?query=histogram_quantile(0.99, sum(rate(tikv_grpc_msg_duration_seconds_bucket{'
+        'type != "kv_gc"}[1m])) by(le, type))&start=%s&end=%s&step=%s' %
         (prome_addr, start, end, step))
     res = r.json()
     if res['status'] == 'error':

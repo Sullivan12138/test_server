@@ -22,5 +22,5 @@ urlpatterns = [
 	#url(r'^$', view.data),
     path('regions/', view.regions),
     path('tikv_replicas/', view.tikv_replicas),
-    path('tidb_replicas/', view.tidb_replicas)
+    path('tidb_replicas/', view.tidb_replicas),
 ]

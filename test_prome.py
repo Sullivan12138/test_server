@@ -107,14 +107,25 @@ def fetch_request(prome_addr, start, end, step=30):
     return res['data']['result']
 
 
+def fetch_statementops(prome_addr, start, end, step=30):
+    r = requests.get('http://%s/api/v1/query_range?query=sum(rate(tidb_executor_statement_total[1m])) by (type)&start=%s&end=%s&step=%s' % (prome_addr, start, end, step))
+    res = r.json()
+    if res['status'] == 'error':
+        raise Exception(
+            'an error occurred when fetching tikv requests: errorType={}: {}'.format(res['errorType'], res['error']))
+    return res['data']['result']
+
+
 prome_addr = '10.233.18.170:9090'
 start = str(int(time.time())-60)
 end = str(int(time.time()))
 step = 60
-request_data = fetch_request(prome_addr, start, end, step)
-print("requests: ", request_data)
-cpudata = fetch_tikv_cpu_usage(prome_addr, start, end, step)
-print("cpudata: ", cpudata)
+statementops = fetch_statementops(prome_addr, start, end, step)
+print("state: ", statementops)
+# request_data = fetch_request(prome_addr, start, end, step)
+# print("requests: ", request_data)
+# cpudata = fetch_tikv_cpu_usage(prome_addr, start, end, step)
+# print("cpudata: ", cpudata)
 # io_util = fetch_disk_io_util(prome_addr, start, end, step)
 # print("io_util: ", io_util)
 # read_latency = fetch_tikv_disk_read_latency(prome_addr, start, end, step)
