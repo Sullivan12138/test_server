@@ -5,7 +5,7 @@
 import time
 import json
 import sys
-from .fetch_prome_metrics import *
+from fetch_prome_metrics import *
 from os import listdir
 
 dir_name_statement_ops = './data/statement_ops/'
@@ -52,6 +52,6 @@ def load_history_workload():
     return statement_ops, kv_grpc_msg_qps, tikv_cpu_usage
 
 
-if __name__ == '__main__':
-    duration = int(sys.argv[1])
+def start_dump(duration):
+    duration = int(duration)
     dump_history_workload(duration)

@@ -6,9 +6,8 @@
 import tensorflow as tf
 import numpy as np
 import time
-import sys
-from .workload_data import load_history_workload
-from .variables import *
+from workload_data import load_history_workload
+from variables import *
 import json
 
 
@@ -177,10 +176,9 @@ def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, weights,
         saver.save(sess, save_model_path + save_model_name)  # 保存模型
 
 
-if __name__ == "__main__":
-
-    period_duration = int(sys.argv[1])
-    train_periods = int(sys.argv[2])
+def start_train(period_duration, train_periods):
+    period_duration = int(period_duration)
+    train_periods = int(train_periods)
     train_end = period_duration * train_periods
 
     statement_ops, kv_grpc_msg_qps, _ = load_history_workload()

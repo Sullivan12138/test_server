@@ -8,8 +8,7 @@ from test_server import predict
 
 def main():
     try:
-        # t1 = td.Thread(target=predict.start_predict, args=())
-        # t1.start()
+        
         t2 = td.Thread(target=predict.start_predict,
                        args=(sys.argv[-3], sys.argv[-2], sys.argv[-1]))
         t2.start()
