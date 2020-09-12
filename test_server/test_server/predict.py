@@ -11,7 +11,6 @@ from .variables import *
 from .train import lstm
 import sys
 import threading
-from .train import weights, biases
 # from .train_cpu_usage import weights_cpu, biases_cpu
 from .globalvar import get_tikv_replicas
 import tensorflow as tf

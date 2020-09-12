@@ -12,16 +12,6 @@ from .variables import *
 import json
 
 
-weights = {
-    'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
-    'out': tf.Variable(tf.random_uniform([rnn_unit, output_size]))
-}
-biases = {
-    'in': tf.Variable(tf.constant(0.1, shape=[rnn_unit, ])),
-    'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
-}
-
-
 def parse_requests(statement_ops, kv_grpc_msg_qps):
     kv_cop = get_kv_cop(kv_grpc_msg_qps)
     sum_data = sum_up(statement_ops)
@@ -111,6 +101,7 @@ def lstm(X, weights, biases, input_size, rnn_unit, keep_prob):
     b_in = biases['in']
 
     input = tf.reshape(X, [-1, input_size])  # 需要将tensor转成2维进行计算，计算后的结果作为隐藏层的输入
+    # TODO 一个bug
     input_rnn = tf.matmul(input, w_in) + b_in
     input_rnn = tf.reshape(input_rnn, [-1, time_step, rnn_unit])  # 将tensor转成3维，作为lstm cell的输入
     cell = tf.nn.rnn_cell.BasicLSTMCell(rnn_unit)  # reuse = sign
