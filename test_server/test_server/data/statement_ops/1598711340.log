@@ -1,0 +1,123 @@
+[
+    {
+        "metric": {
+            "type": "Begin"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Commit"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "CreateTable"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Delete"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Insert"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Replace"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Rollback"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Select"
+        },
+        "values": [
+            [
+                1598711340,
+                "512.3304929657447"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Show"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Update"
+        },
+        "values": [
+            [
+                1598711340,
+                "634.4818896937913"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "type": "Use"
+        },
+        "values": [
+            [
+                1598711340,
+                "0"
+            ]
+        ]
+    }
+]

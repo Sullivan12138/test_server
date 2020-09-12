@@ -6,13 +6,13 @@
 import numpy as np
 import yaml
 import time
-from .fetch_prome_metrics import *
-from .variables import *
-from .train import lstm
+from fetch_prome_metrics import *
+from variables import *
+from train import lstm
 import sys
 import threading
 # from .train_cpu_usage import weights_cpu, biases_cpu
-from .globalvar import get_tikv_replicas
+from globalvar import get_tikv_replicas
 import tensorflow as tf
 
 
@@ -295,4 +295,8 @@ def start_predict(name, namespace, predict_duration):
             predict_replicas = expected_tikv_replicas
         refer_data['replicas'] = predict_replicas
         j += 1
-        time.sleep(60)
+    time.sleep(60)
+
+
+if __name__ == "__main__":
+    start_predict("st-2", "pd-team-s2", "180")
