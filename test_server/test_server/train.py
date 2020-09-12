@@ -6,6 +6,7 @@
 import tensorflow as tf
 import numpy as np
 import time
+import sys
 from workload_data import load_history_workload
 from variables import *
 import json

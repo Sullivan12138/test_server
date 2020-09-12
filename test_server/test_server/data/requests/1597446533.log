@@ -1,0 +1,1334 @@
+[
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "check_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "coprocessor"
+        },
+        "values": [
+            [
+                1597446533,
+                "13667.111111111111"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "coprocessor_stream"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "invalid"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_batch_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_batch_get_command"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_batch_rollback"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_check_txn_status"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_cleanup"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_commit"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_delete_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "9556.355555555554"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_pessimistic_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_pessimistic_rollback"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_prewrite"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_resolve_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_scan_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "kv_txn_heart_beat"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "mvcc_get_by_key"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "mvcc_get_by_start_ts"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "physical_scan_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_batch_delete"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_batch_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_batch_get_command"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_batch_put"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_batch_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_delete"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_delete_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_put"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "raw_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "read_index"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "register_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "remove_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "split_region"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-0",
+            "type": "unsafe_destroy_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "check_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "coprocessor"
+        },
+        "values": [
+            [
+                1597446533,
+                "15133.597031177085"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "coprocessor_stream"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "invalid"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_batch_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0.04444345681207085"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_batch_get_command"
+        },
+        "values": [
+            [
+                1597446533,
+                "3221.172862825271"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_batch_rollback"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_check_txn_status"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_cleanup"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_commit"
+        },
+        "values": [
+            [
+                1597446533,
+                "0.022221728406035424"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_delete_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "6802.071065087443"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_pessimistic_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_pessimistic_rollback"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_prewrite"
+        },
+        "values": [
+            [
+                1597446533,
+                "0.022221728406035424"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_resolve_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_scan_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "kv_txn_heart_beat"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "mvcc_get_by_key"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "mvcc_get_by_start_ts"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "physical_scan_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_batch_delete"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_batch_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_batch_get_command"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_batch_put"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_batch_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_delete"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_delete_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_put"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "raw_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "read_index"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "register_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "remove_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "split_region"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-1",
+            "type": "unsafe_destroy_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "check_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "coprocessor"
+        },
+        "values": [
+            [
+                1597446533,
+                "16805.555555555555"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "coprocessor_stream"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "invalid"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_batch_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0.8888888888888888"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_batch_get_command"
+        },
+        "values": [
+            [
+                1597446533,
+                "12702.2"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_batch_rollback"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_check_txn_status"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_cleanup"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_commit"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_delete_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "2"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_pessimistic_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_pessimistic_rollback"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_prewrite"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_resolve_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_scan_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "kv_txn_heart_beat"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "mvcc_get_by_key"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "mvcc_get_by_start_ts"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "physical_scan_lock"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_batch_delete"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_batch_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_batch_get_command"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_batch_put"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_batch_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_delete"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_delete_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_get"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_put"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "raw_scan"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "read_index"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "register_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "remove_lock_observer"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "split_region"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    },
+    {
+        "metric": {
+            "instance": "st-2-tikv-2",
+            "type": "unsafe_destroy_range"
+        },
+        "values": [
+            [
+                1597446533,
+                "0"
+            ]
+        ]
+    }
+]
