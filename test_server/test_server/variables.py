@@ -1,6 +1,8 @@
 """
 这个文件里包含的是训练和预测需要用到的变量
 """
+import tensorflow as tf
+
 input_size = 1  # 输入维度
 output_size = 1  # 输出维度
 rnn_unit = 12  # 隐藏层节点
