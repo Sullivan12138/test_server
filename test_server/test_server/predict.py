@@ -255,6 +255,7 @@ def start_predict(name, namespace, predict_duration):
     refer_data = get_tikv_replicas()
     refer_data['name'] = name
     refer_data['namespace'] = namespace
+    predict_duration = int(predict_duration)
 
     j = 0
     while j < predict_duration: # 每一分钟都进行一次预测
