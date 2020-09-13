@@ -14,7 +14,6 @@ from .globalvar import get_tikv_replicas
 from .fetch_prome_metrics import *
 import json
 import yaml
-from sklearn.preprocessing import StandardScaler
 
 def yaml_to_dict(yaml_path):
     with open(yaml_path, "r") as f:
@@ -162,8 +161,12 @@ def get_train_data(data, batch_size, time_step, train_end, predict_step, train_b
     batch_index = []
     data_train = data[train_begin:train_end]
     data_train = np.array(data_train)
-    scaler = StandardScaler()
-    normalized_train_data = scaler.fit_transform(data_train)  # 标准化
+    mean_x = np.mean(data_train, axis=0)
+    std_x = np.std(data_train, axis=0)
+    if std_x == 0.:
+        normalized_train_data = data_train - mean_x
+    else:
+        normalized_train_data = (data_train - mean_x) / std_x # 标准化
     print("len(data_train): ", len(data_train))
     normalized_train_data = normalized_train_data.tolist()
 
@@ -216,8 +219,12 @@ def get_test_y():
     kv_grpc_msg_qps = fetch_kv_grpc_msg_qps(start, end, 60)
     test_y = parse_predict(statement_ops, kv_grpc_msg_qps)
     test_y = np.array(test_y)
-    scaler = StandardScaler()
-    normalized_test_y = scaler.fit_transform(test_y)
+    mean_x = np.mean(test_y, axis=0)
+    std_x = np.std(test_y, axis=0)
+    if std_x == 0.:
+        normalized_test_y = test_y - mean_x
+    else:
+        normalized_test_y = (test_y - mean_x) / std_x # 将原数据标准化，否则预测误差会很大
     normalized_test_y = normalized_test_y.tolist()
     return normalized_test_y
 
