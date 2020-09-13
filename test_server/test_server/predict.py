@@ -164,10 +164,10 @@ def get_test_y():
 #     return test_x_cpu
 
 
-def predict(test_x, save_model_path, weights, biases):
+def predict(test_x, save_model_path):
     X = tf.placeholder(tf.float32, shape=[None, time_step, input_size])
     keep_prob = tf.placeholder('float')
-    pred, _, _, _ = lstm(X, weights, biases, input_size, rnn_unit, kp)
+    pred, _, _, _ = lstm(X, input_size, rnn_unit, kp)
 
     saver = tf.train.Saver(max_to_keep=1)
     with tf.Session() as sess:
@@ -259,7 +259,7 @@ def start_predict(name, namespace, predict_duration):
     j = 0
     while j < predict_duration: # 每一分钟都进行一次预测
         test_x, mean_x, std_x = get_test_data()
-        test_predict = predict(test_x, save_model_path_requests, weights, biases)
+        test_predict = predict(test_x, save_model_path_requests)
         # test_x_cpu = get_test_data_cpu()
         test_y = get_test_y()
         print('test_y:', np.array(test_y).shape)
