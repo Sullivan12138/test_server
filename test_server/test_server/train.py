@@ -101,7 +101,7 @@ def get_train_data(data, batch_size, time_step, train_end, predict_step, train_b
 
 
 # ——————————————————定义网络——————————————————
-def lstm(X, weights, biases, input_size, rnn_unit, keep_prob):
+def lstm(X, input_size, rnn_unit, keep_prob):
     # X是一个三维tensor
     batch_size = tf.shape(X)[0]
     time_step = tf.shape(X)[1]
@@ -131,7 +131,7 @@ def lstm(X, weights, biases, input_size, rnn_unit, keep_prob):
 
 
 # ——————————————————训练模型—————————————————
-def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, weights, biases, train_end,
+def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, train_end,
                batch_size, time_step, kp, save_model_path, train_begin=0):
     X = tf.placeholder(tf.float32, shape=[None, time_step, input_size])
     Y = tf.placeholder(tf.float32, shape=[None, output_size])
@@ -198,7 +198,7 @@ def start_train(period_duration, train_periods):
     # ——————————————————定义神经网络变量——————————————————
     # 输入层、输出层权重、偏置
     t0 = time.time()
-    train_lstm(statement_ops, input_size, output_size, lr, train_time, rnn_unit, weights, biases,
+    train_lstm(statement_ops, input_size, output_size, lr, train_time, rnn_unit, 
                train_end, batch_size, time_step, kp, save_model_path_requests)
     t1 = time.time()
     print("时间:%.4fs" % (t1 - t0))
