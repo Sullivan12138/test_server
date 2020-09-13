@@ -15,15 +15,6 @@ from .fetch_prome_metrics import *
 import json
 import yaml
 
-weights = {
-    'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
-    'out': tf.Variable(tf.random_uniform([rnn_unit, output_size]))
-}
-biases = {
-    'in': tf.Variable(tf.constant(0.1, shape=[rnn_unit, ])),
-    'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
-}
-
 
 def yaml_to_dict(yaml_path):
     with open(yaml_path, "r") as f:
@@ -226,10 +217,10 @@ def get_test_y():
     return normalized_test_y
 
 
-def predict(test_x, save_model_path):
+def predict(test_x, save_model_path, weights, biases):
     X = tf.placeholder(tf.float32, shape=[None, time_step, input_size])
     keep_prob = tf.placeholder('float')
-    pred, _, _, _ = lstm(X, input_size, rnn_unit, kp)
+    pred, _, _, _ = lstm(X, input_size, rnn_unit, kp, weights, biases)
 
     saver = tf.train.Saver(max_to_keep=1)
     with tf.Session() as sess:
@@ -271,7 +262,7 @@ def predict(test_x, save_model_path):
 
 
 # ——————————————————定义网络——————————————————
-def lstm(X, input_size, rnn_unit, keep_prob):
+def lstm(X, input_size, rnn_unit, keep_prob, weights, biases):
     # X是一个三维tensor
     batch_size = tf.shape(X)[0]
     time_step = tf.shape(X)[1]
@@ -301,7 +292,7 @@ def lstm(X, input_size, rnn_unit, keep_prob):
 
 
 # ——————————————————训练模型—————————————————
-def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, train_end,
+def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, weights, biases, train_end,
                batch_size, time_step, kp, save_model_path, train_begin=0):
     X = tf.placeholder(tf.float32, shape=[None, time_step, input_size])
     Y = tf.placeholder(tf.float32, shape=[None, output_size])
@@ -309,7 +300,7 @@ def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, train_en
     batch_index, train_x, train_y = get_train_data(data, batch_size, time_step, train_end, predict_step, train_begin)
     print("train_x,shape", np.array(train_x).shape)
     print("train_y.shape", np.array(train_y).shape)
-    pred, _, m, mm = lstm(X, input_size, rnn_unit, keep_prob)
+    pred, _, m, mm = lstm(X, input_size, rnn_unit, keep_prob, weights, biases)
     # 损失函数
     loss = tf.reduce_mean(tf.square(tf.reshape(pred, [-1, output_size]) - tf.reshape(Y, [-1, output_size])))
     train_op = tf.train.AdamOptimizer(lr).minimize(loss)
@@ -355,7 +346,7 @@ def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, train_en
         saver.save(sess, save_model_path + save_model_name)  # 保存模型
 
 
-def start_train(period_duration, train_periods):
+def start_train(period_duration, train_periods, weights, biases):
     period_duration = int(period_duration)
     train_periods = int(train_periods)
     train_end = period_duration * train_periods
@@ -368,15 +359,15 @@ def start_train(period_duration, train_periods):
     # ——————————————————定义神经网络变量——————————————————
     # 输入层、输出层权重、偏置
     t0 = time.time()
-    train_lstm(statement_ops, input_size, output_size, lr, train_time, rnn_unit, 
+    train_lstm(statement_ops, input_size, output_size, lr, train_time, rnn_unit, weights, biases,
                train_end, batch_size, time_step, kp, save_model_path_requests)
     t1 = time.time()
     print("时间:%.4fs" % (t1 - t0))
 
 
-def start_predict(name, namespace, predict_duration):
+def start_predict(name, namespace, predict_duration, weights, biases):
     init_tikv_replicas = yaml_to_dict(yaml_path) # 从yaml文件中取出当前的tikv副本数目
-    refer_data = get_tikv_replicas()
+    refer_data = get_tikv_replicas() # 这是将要由django接口传出去的数据
     refer_data['name'] = name
     refer_data['namespace'] = namespace
     predict_duration = int(predict_duration)
@@ -384,7 +375,7 @@ def start_predict(name, namespace, predict_duration):
     j = 0
     while j < predict_duration: # 每一分钟都进行一次预测
         test_x, mean_x, std_x = get_test_data()
-        test_predict = predict(test_x, save_model_path_requests)
+        test_predict = predict(test_x, save_model_path_requests, weights, biases)
         # test_x_cpu = get_test_data_cpu()
         test_y = get_test_y()
         print('test_y:', np.array(test_y).shape)
@@ -424,5 +415,13 @@ def start_predict(name, namespace, predict_duration):
 
 
 def start(period_duration, train_periods, predict_duration):
-    start_train(period_duration, train_periods)
-    start_predict("st-2", "pd-team-s2", predict_duration)
+    weights = {
+        'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
+        'out': tf.Variable(tf.random_uniform([rnn_unit, output_size]))
+    }
+    biases = {
+        'in': tf.Variable(tf.constant(0.1, shape=[rnn_unit, ])),
+        'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
+    }
+    start_train(period_duration, train_periods, weights, biases)
+    start_predict("st-2", "pd-team-s2", predict_duration, weights, biases)
