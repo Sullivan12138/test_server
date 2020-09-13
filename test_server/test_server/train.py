@@ -10,7 +10,7 @@ import time
 import sys
 from .workload_data import load_history_workload
 from .variables import *
-from .globalvar import get_tikv_replicas
+from . import globalvar
 from .fetch_prome_metrics import *
 import json
 import yaml
@@ -419,7 +419,7 @@ def train_lstm(data, train_begin, train_end, refer_data, predict_duration, init_
 
 def start(period_duration, train_periods, predict_duration):
     init_tikv_replicas = yaml_to_dict(yaml_path) # 从yaml文件中取出当前的tikv副本数目
-    refer_data = get_tikv_replicas() # 这是将要由django接口传出去的数据
+    refer_data = globalvar.get_tikv_replicas() # 这是将要由django接口传出去的数据
     refer_data['name'] = name
     refer_data['namespace'] = namespace
 
