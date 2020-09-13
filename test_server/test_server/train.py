@@ -159,10 +159,10 @@ def cal_weights_predict(sum_data, proportions, weight):
 预测部分的输入和训练部分的输入数据结构稍有不同，所以要用两种函数来写
 """
 def parse_predict(statement_ops, kv_grpc_msg_qps):
-    kv_cop = get_kv_cop(kv_grpc_msg_qps)
-    sum_data = sum_up(statement_ops)
-    proportions = determine_workload_proportion(statement_ops, sum_data, kv_cop)
-    new_input_data = cal_weights(sum_data, proportions, weight)
+    kv_cop = get_kv_cop_predict(kv_grpc_msg_qps)
+    sum_data = sum_up_predict(statement_ops)
+    proportions = determine_workload_proportion_predict(statement_ops, sum_data, kv_cop)
+    new_input_data = cal_weights_predict(sum_data, proportions, weight)
     return new_input_data
 
 
