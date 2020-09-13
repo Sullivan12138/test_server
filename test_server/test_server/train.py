@@ -7,9 +7,10 @@ import tensorflow as tf
 import numpy as np
 import time
 import sys
-from workload_data import load_history_workload
-from variables import *
-from globalvar import get_tikv_replicas
+from .workload_data import load_history_workload
+from .variables import *
+from .globalvar import get_tikv_replicas
+from .fetch_prome_metrics import *
 import json
 import yaml
 
@@ -30,6 +31,14 @@ def parse_requests(statement_ops, kv_grpc_msg_qps):
     return new_input_data
 
 
+def parse(statement_ops, kv_grpc_msg_qps):
+    kv_cop = get_kv_cop(kv_grpc_msg_qps)
+    sum_data = sum_up(statement_ops)
+    proportions = determine_workload_proportion(statement_ops, sum_data, kv_cop)
+    new_input_data = cal_weights(sum_data, proportions, weight)
+    return new_input_data
+
+    
 def yaml_to_dict(yaml_path):
     with open(yaml_path, "r") as f:
         generate_dict = yaml.load(f, Loader=yaml.FullLoader)
@@ -345,6 +354,6 @@ def start_predict(name, namespace, predict_duration):
     time.sleep(60)
 
 
-if __name__ == "__main__":
-    start_train(sys.argv[-3], sys.argv[-2])
-    start_predict("st-2", "pd-team-s2", sys.argv[-1])
+def start(period_duration, train_periods, predict_duration):
+    start_train(period_duration, train_periods)
+    start_predict("st-2", "pd-team-s2", predict_duration)
