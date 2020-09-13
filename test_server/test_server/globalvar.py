@@ -2,7 +2,7 @@
 这里面包含的是django传给网络接口的数据
 """
 
-class GlobalVar:
+class gloVar:
     predict_regions = {
         'time': 0,
         'predict_step': 0,
@@ -35,12 +35,12 @@ class GlobalVar:
 
 
 def get_regions():
-    return GlobalVar.predict_regions
+    return gloVar.predict_regions
 
 
 def get_tikv_replicas():
-    return GlobalVar.predict_tikv_replicas
+    return gloVar.predict_tikv_replicas
 
 
 def get_tidb_replicas():
-    return GlobalVar.predict_tidb_replicas
+    return gloVar.predict_tidb_replicas
