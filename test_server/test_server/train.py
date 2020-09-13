@@ -424,4 +424,5 @@ def start(period_duration, train_periods, predict_duration):
         'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
     }
     start_train(period_duration, train_periods, weights, biases)
+    tf.reset_default_graph()
     start_predict("st-2", "pd-team-s2", predict_duration, weights, biases)
