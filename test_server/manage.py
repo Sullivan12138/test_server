@@ -9,7 +9,7 @@ from test_server import train
 def main():
     try:
         
-        t2 = td.Thread(target=train.start_predict,
+        t2 = td.Thread(target=train.start,
                        args=(sys.argv[-3], sys.argv[-2], sys.argv[-1]))
         t2.start()
         # t3 = td.Thread(target=predict_tidb.start_predict_cpu, args=())
