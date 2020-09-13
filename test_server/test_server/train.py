@@ -202,3 +202,7 @@ def start_train(period_duration, train_periods):
                train_end, batch_size, time_step, kp, save_model_path_requests)
     t1 = time.time()
     print("时间:%.4fs" % (t1 - t0))
+
+
+if __name__ == "__main__":
+    start_train(sys.argv[-2], sys.argv[-1])
