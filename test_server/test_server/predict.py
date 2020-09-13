@@ -2,6 +2,8 @@
 用于预测的代码
 目前还没有实现同时预测cpu usage和ops的功能
 同时预测似乎也没有什么用
+我发现不能将train和predict放在两个文件里，虽然这是两个独立的过程，
+但似乎一定要放在同一个文件里
 """
 import numpy as np
 import yaml
@@ -11,7 +13,6 @@ from variables import *
 from train import lstm
 import sys
 import threading
-# from .train_cpu_usage import weights_cpu, biases_cpu
 from globalvar import get_tikv_replicas
 import tensorflow as tf
 
@@ -76,13 +77,13 @@ def parse(statement_ops, kv_grpc_msg_qps):
     return new_input_data
 
 
-def parse_cpu(tikv_cpu_usage):
-    length = len(tikv_cpu_usage[0]['values'])
-    sum = [0. for _ in range(length)]
-    for metric in tikv_cpu_usage:
-        for i in range(len(metric['values'])):
-            sum[i] += float(metric['values'][i][1])
-    return sum
+# def parse_cpu(tikv_cpu_usage):
+#     length = len(tikv_cpu_usage[0]['values'])
+#     sum = [0. for _ in range(length)]
+#     for metric in tikv_cpu_usage:
+#         for i in range(len(metric['values'])):
+#             sum[i] += float(metric['values'][i][1])
+#     return sum
 
 
 # # 获取测试集
