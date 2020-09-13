@@ -23,3 +23,13 @@ scan_per_cop = [0.0157, 0.0252, 0.0501]  # kv_cop与scan的比例系数
 scan_per_cop_level = 0  # 比例系数的等级，0表示maxscanlength=1000，1表示100，2表示10
 three_nodes_endurable_ops = 75
 four_nodes_endurable_ops = 83
+weights = {
+    'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
+    'out': tf.Variable(tf.random_uniform([rnn_unit, output_size]))
+}
+biases = {
+    'in': tf.Variable(tf.constant(0.1, shape=[rnn_unit, ])),
+    'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
+}
+name = "st-2"
+namespace = "pd-team-s2"
