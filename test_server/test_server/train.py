@@ -292,13 +292,12 @@ def lstm(X, input_size, rnn_unit, keep_prob, weights, biases):
 
 
 # ——————————————————训练模型—————————————————
-def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, weights, biases, train_end,
-               batch_size, time_step, kp, save_model_path, train_begin=0):
+def train_lstm(data, train_begin, train_end, refer_data, predict_duration, init_tikv_replicas):
     X = tf.placeholder(tf.float32, shape=[None, time_step, input_size])
     Y = tf.placeholder(tf.float32, shape=[None, output_size])
     keep_prob = tf.placeholder('float')
     batch_index, train_x, train_y = get_train_data(data, batch_size, time_step, train_end, predict_step, train_begin)
-    print("train_x,shape", np.array(train_x).shape)
+    print("train_x.shape", np.array(train_x).shape)
     print("train_y.shape", np.array(train_y).shape)
     pred, _, m, mm = lstm(X, input_size, rnn_unit, keep_prob, weights, biases)
     # 损失函数
@@ -310,7 +309,7 @@ def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, weights,
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
-        ckpt = tf.train.get_checkpoint_state(save_model_path)  # checkpoint存在的目录
+        ckpt = tf.train.get_checkpoint_state(save_model_path_requests)  # checkpoint存在的目录
         if ckpt and ckpt.model_checkpoint_path:
             saver.restore(sess, ckpt.model_checkpoint_path)  # 自动恢复model_checkpoint_path保存模型一般是最新
             print("Model restored...")
@@ -325,31 +324,90 @@ def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, weights,
                             Y: train_y[batch_index[step]:batch_index[step + 1]],
                             keep_prob: kp})
 
-        test_begin = 0
-        test_end = len(data)
-        _, test_x, test_y = get_train_data(data, batch_size, time_step, test_end, predict_step, test_begin)
-        test_predict = []
-        for step in range(len(test_x)):
-            prob = sess.run(pred, feed_dict={X: [test_x[step]], keep_prob: kp})
-            predict = prob.reshape((-1))
-            test_predict.extend(predict)
-        test_predict = np.array(test_predict).reshape(-1,)
-        print(test_predict.shape)
-        test_predict = test_predict.tolist()
-        test_y = np.array(test_y).reshape(-1, )
-        print(test_y.shape)
-        test_y = test_y.tolist()
-        with open('y.json', 'w') as f:
-            json.dump(test_y, f, indent=4)
-        with open('y2.json', 'w') as f:
-            json.dump(test_predict, f, indent=4)
-        saver.save(sess, save_model_path + save_model_name)  # 保存模型
+        saver.save(sess, save_model_path_requests + save_model_name)  # 保存模型
 
+        # test_begin = 0
+        # test_end = len(data)
+        # _, test_x, test_y = get_train_data(data, batch_size, time_step, test_end, predict_step, test_begin)
+        # test_predict = []
+        # for step in range(len(test_x)):
+        #     prob = sess.run(pred, feed_dict={X: [test_x[step]], keep_prob: kp})
+        #     predict = prob.reshape((-1))
+        #     test_predict.extend(predict)
+        # test_predict = np.array(test_predict).reshape(-1,)
+        # print(test_predict.shape)
+        # test_predict = test_predict.tolist()
+        # test_y = np.array(test_y).reshape(-1, )
+        # print(test_y.shape)
+        # test_y = test_y.tolist()
+        # with open('y.json', 'w') as f:
+        #     json.dump(test_y, f, indent=4)
+        # with open('y2.json', 'w') as f:
+        #     json.dump(test_predict, f, indent=4)
 
-def start_train(period_duration, train_periods, weights, biases):
+        # 以下是预测部分
+        
+        predict_duration = int(predict_duration)
+
+        j = 0
+        while j < predict_duration: # 每一分钟都进行一次预测
+            test_x, mean_x, std_x = get_test_data()
+            test_predict = []
+            for step in range(len(test_x)):
+                prob = sess.run(pred, feed_dict={X: [test_x[step]], keep_prob: kp})
+                predict = prob.reshape((-1))
+                test_predict.extend(predict)
+            print('test_predict.shape:', np.array(test_predict).shape)
+            # test_x_cpu = get_test_data_cpu()
+            test_y = get_test_y()
+            print('test_y:', np.array(test_y).shape)
+
+            # td = MyThread(predict_cpu, args=(test_x_cpu, save_model_path_cpu))
+            # td.start()
+            # td.join()
+            # test_predict_cpu = td.get_result()
+            # if test_predict_cpu is None:
+            #     print("Error run cpu predict thread")
+
+            max_data = max(test_predict) # 未来这predict_step分钟内最高峰的数据
+            max_index = test_predict.index(max_data)
+            before_normalized_max_data = max_data * std_x + mean_x
+            slope = (max_data - test_y[0]) / (max_index + 1)
+            if slope * min_scale_interval > 1:
+                open_multi_nodes = True
+            else:
+                open_multi_nodes = False
+
+            # 以下是计算应该开启多少节点的代码，根据曲线的斜率以及在曲线最高点集群能够正常运转所需要的最少节点数目
+            # 目前先只考虑节点数目在3-5之间变化的情况
+            expected_tikv_replicas = 3
+            predict_replicas = 3
+            if before_normalized_max_data >= three_nodes_endurable_ops and before_normalized_max_data < four_nodes_endurable_ops:
+                expected_tikv_replicas = 4
+            elif before_normalized_max_data > four_nodes_endurable_ops:
+                expected_tikv_replicas = 5
+            if open_multi_nodes == False:
+                if expected_tikv_replicas > init_tikv_replicas:
+                    predict_replicas = init_tikv_replicas + 1
+            else:
+                predict_replicas = expected_tikv_replicas
+            refer_data['replicas'] = predict_replicas
+            j += 1
+            time.sleep(60)
+        
+
+def start(period_duration, train_periods, predict_duration):
+    init_tikv_replicas = yaml_to_dict(yaml_path) # 从yaml文件中取出当前的tikv副本数目
+    refer_data = get_tikv_replicas() # 这是将要由django接口传出去的数据
+    refer_data['name'] = name
+    refer_data['namespace'] = namespace
+
     period_duration = int(period_duration)
     train_periods = int(train_periods)
     train_end = period_duration * train_periods
+    train_begin = 0
+
+    predict_duration = int(predict_duration)
 
     statement_ops, kv_grpc_msg_qps, _ = load_history_workload()
     print("statement_ops len: ", len(statement_ops))
@@ -359,70 +417,6 @@ def start_train(period_duration, train_periods, weights, biases):
     # ——————————————————定义神经网络变量——————————————————
     # 输入层、输出层权重、偏置
     t0 = time.time()
-    train_lstm(statement_ops, input_size, output_size, lr, train_time, rnn_unit, weights, biases,
-               train_end, batch_size, time_step, kp, save_model_path_requests)
+    train_lstm(statement_ops, train_begin, train_end, refer_data, predict_duration, init_tikv_replicas)
     t1 = time.time()
     print("时间:%.4fs" % (t1 - t0))
-
-
-def start_predict(name, namespace, predict_duration, weights, biases):
-    init_tikv_replicas = yaml_to_dict(yaml_path) # 从yaml文件中取出当前的tikv副本数目
-    refer_data = get_tikv_replicas() # 这是将要由django接口传出去的数据
-    refer_data['name'] = name
-    refer_data['namespace'] = namespace
-    predict_duration = int(predict_duration)
-
-    j = 0
-    while j < predict_duration: # 每一分钟都进行一次预测
-        test_x, mean_x, std_x = get_test_data()
-        test_predict = predict(test_x, save_model_path_requests, weights, biases)
-        # test_x_cpu = get_test_data_cpu()
-        test_y = get_test_y()
-        print('test_y:', np.array(test_y).shape)
-
-        # td = MyThread(predict_cpu, args=(test_x_cpu, save_model_path_cpu))
-        # td.start()
-        # td.join()
-        # test_predict_cpu = td.get_result()
-        # if test_predict_cpu is None:
-        #     print("Error run cpu predict thread")
-
-        max_data = max(test_predict) # 未来这predict_step分钟内最高峰的数据
-        max_index = test_predict.index(max_data)
-        before_normalized_max_data = max_data * std_x + mean_x
-        slope = (max_data - test_y[0]) / (max_index + 1)
-        if slope * min_scale_interval > 1:
-            open_multi_nodes = True
-        else:
-            open_multi_nodes = False
-
-        # 以下是计算应该开启多少节点的代码，根据曲线的斜率以及在曲线最高点集群能够正常运转所需要的最少节点数目
-        # 目前先只考虑节点数目在3-5之间变化的情况
-        expected_tikv_replicas = 3
-        predict_replicas = 3
-        if before_normalized_max_data >= three_nodes_endurable_ops and before_normalized_max_data < four_nodes_endurable_ops:
-            expected_tikv_replicas = 4
-        elif before_normalized_max_data > four_nodes_endurable_ops:
-            expected_tikv_replicas = 5
-        if open_multi_nodes == False:
-            if expected_tikv_replicas > init_tikv_replicas:
-                predict_replicas = init_tikv_replicas + 1
-        else:
-            predict_replicas = expected_tikv_replicas
-        refer_data['replicas'] = predict_replicas
-        j += 1
-    time.sleep(60)
-
-
-def start(period_duration, train_periods, predict_duration):
-    weights = {
-        'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
-        'out': tf.Variable(tf.random_uniform([rnn_unit, output_size]))
-    }
-    biases = {
-        'in': tf.Variable(tf.constant(0.1, shape=[rnn_unit, ])),
-        'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
-    }
-    start_train(period_duration, train_periods, weights, biases)
-    tf.reset_default_graph()
-    start_predict("st-2", "pd-team-s2", predict_duration, weights, biases)
