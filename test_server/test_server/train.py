@@ -15,15 +15,6 @@ from .fetch_prome_metrics import *
 import json
 import yaml
 
-weights = {
-    'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
-    'out': tf.Variable(tf.random_uniform([rnn_unit, output_size]))
-}
-biases = {
-    'in': tf.Variable(tf.constant(0.1, shape=[rnn_unit, ])),
-    'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
-}
-
 def yaml_to_dict(yaml_path):
     with open(yaml_path, "r") as f:
         generate_dict = yaml.load(f, Loader=yaml.FullLoader)
@@ -303,6 +294,14 @@ def lstm(X, input_size, rnn_unit, keep_prob, weights, biases):
 def train_lstm(data, train_begin, train_end, refer_data, predict_duration, init_tikv_replicas):
     X = tf.placeholder(tf.float32, shape=[None, time_step, input_size])
     Y = tf.placeholder(tf.float32, shape=[None, output_size])
+    weights = {
+        'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
+        'out': tf.Variable(tf.random_uniform([rnn_unit, output_size]))
+    }
+    biases = {
+        'in': tf.Variable(tf.constant(0.1, shape=[rnn_unit, ])),
+        'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
+    }
     keep_prob = tf.placeholder('float')
     batch_index, train_x, train_y = get_train_data(data, batch_size, time_step, train_end, predict_step, train_begin)
     print("train_x.shape", np.array(train_x).shape)
