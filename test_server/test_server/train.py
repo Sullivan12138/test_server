@@ -11,6 +11,7 @@ from workload_data import load_history_workload
 from variables import *
 from globalvar import get_tikv_replicas
 import json
+import yaml
 
 weights = {
     'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
