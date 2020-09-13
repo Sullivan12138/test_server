@@ -15,6 +15,14 @@ from .fetch_prome_metrics import *
 import json
 import yaml
 
+weights = {
+    'in': tf.Variable(tf.random_uniform([input_size, rnn_unit])),  # max_val=0.125
+    'out': tf.Variable(tf.random_uniform([rnn_unit, output_size]))
+}
+biases = {
+    'in': tf.Variable(tf.constant(0.1, shape=[rnn_unit, ])),
+    'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
+}
 
 def yaml_to_dict(yaml_path):
     with open(yaml_path, "r") as f:
