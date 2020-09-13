@@ -139,7 +139,7 @@ def train_lstm(data, input_size, output_size, lr, train_time, rnn_unit, train_en
     batch_index, train_x, train_y = get_train_data(data, batch_size, time_step, train_end, predict_step, train_begin)
     print("train_x,shape", np.array(train_x).shape)
     print("train_y.shape", np.array(train_y).shape)
-    pred, _, m, mm = lstm(X, weights, biases, input_size, rnn_unit, keep_prob)
+    pred, _, m, mm = lstm(X, input_size, rnn_unit, keep_prob)
     # 损失函数
     loss = tf.reduce_mean(tf.square(tf.reshape(pred, [-1, output_size]) - tf.reshape(Y, [-1, output_size])))
     train_op = tf.train.AdamOptimizer(lr).minimize(loss)
