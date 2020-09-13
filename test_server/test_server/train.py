@@ -14,6 +14,7 @@ from .globalvar import get_tikv_replicas
 from .fetch_prome_metrics import *
 import json
 import yaml
+from sklearn.preprocessing import StandardScaler
 
 def yaml_to_dict(yaml_path):
     with open(yaml_path, "r") as f:
@@ -161,7 +162,8 @@ def get_train_data(data, batch_size, time_step, train_end, predict_step, train_b
     batch_index = []
     data_train = data[train_begin:train_end]
     data_train = np.array(data_train)
-    normalized_train_data = (data_train - np.mean(data_train, axis=0)) / np.std(data_train, axis=0)  # 标准化
+    scaler = StandardScaler()
+    normalized_train_data = scaler.fit_transform(data_train)  # 标准化
     print("len(data_train): ", len(data_train))
     normalized_train_data = normalized_train_data.tolist()
 
@@ -197,7 +199,10 @@ def get_test_data():
         res = np.array(res)
         mean_x = np.mean(res, axis=0)
         std_x = np.std(res, axis=0)
-        normalized_test_data = (res - mean_x) / std_x # 将原数据标准化，否则预测误差会很大
+        if std_x == 0.:
+            normalized_test_data = res - mean_x
+        else:
+            normalized_test_data = (res - mean_x) / std_x # 将原数据标准化，否则预测误差会很大
         normalized_test_data = normalized_test_data.tolist()
         test_x.append(normalized_test_data)
     return test_x, mean_x, std_x
@@ -211,7 +216,8 @@ def get_test_y():
     kv_grpc_msg_qps = fetch_kv_grpc_msg_qps(start, end, 60)
     test_y = parse_predict(statement_ops, kv_grpc_msg_qps)
     test_y = np.array(test_y)
-    normalized_test_y = (test_y - np.mean(test_y, axis=0)) / np.std(test_y, axis=0)
+    scaler = StandardScaler()
+    normalized_test_y = scaler.fit_transform(normalized_test_y)
     normalized_test_y = normalized_test_y.tolist()
     return normalized_test_y
 
@@ -398,6 +404,7 @@ def train_lstm(data, train_begin, train_end, refer_data, predict_duration, init_
                     predict_replicas = init_tikv_replicas + 1
             else:
                 predict_replicas = expected_tikv_replicas
+            print("第", j, "分钟的预测:", predict_replicas)
             refer_data['replicas'] = predict_replicas
             j += 1
             time.sleep(60)
