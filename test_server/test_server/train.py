@@ -217,7 +217,7 @@ def get_test_y():
     test_y = parse_predict(statement_ops, kv_grpc_msg_qps)
     test_y = np.array(test_y)
     scaler = StandardScaler()
-    normalized_test_y = scaler.fit_transform(normalized_test_y)
+    normalized_test_y = scaler.fit_transform(test_y)
     normalized_test_y = normalized_test_y.tolist()
     return normalized_test_y
 
