@@ -412,7 +412,7 @@ def train_lstm(data, train_begin, train_end, refer_data, predict_duration, init_
             else:
                 predict_replicas = expected_tikv_replicas
             print("第", j, "分钟的预测:", predict_replicas)
-            refer_data['replicas'] = predict_replicas
+            refer_data['recommendedReplicas'] = predict_replicas
             j += 1
             time.sleep(60)
         
