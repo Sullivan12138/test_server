@@ -2,6 +2,7 @@
 用于训练模型的代码
 训练ops
 训练完了以后保存模型
+以及用于预测的代码
 """
 import tensorflow as tf
 import numpy as np
@@ -23,22 +24,7 @@ biases = {
     'out': tf.Variable(tf.constant(0.1, shape=[output_size, ]))
 }
 
-def parse_requests(statement_ops, kv_grpc_msg_qps):
-    kv_cop = get_kv_cop(kv_grpc_msg_qps)
-    sum_data = sum_up(statement_ops)
-    proportions = determine_workload_proportion(statement_ops, sum_data, kv_cop)
-    new_input_data = cal_weights(sum_data, proportions, weight)
-    return new_input_data
 
-
-def parse(statement_ops, kv_grpc_msg_qps):
-    kv_cop = get_kv_cop(kv_grpc_msg_qps)
-    sum_data = sum_up(statement_ops)
-    proportions = determine_workload_proportion(statement_ops, sum_data, kv_cop)
-    new_input_data = cal_weights(sum_data, proportions, weight)
-    return new_input_data
-
-    
 def yaml_to_dict(yaml_path):
     with open(yaml_path, "r") as f:
         generate_dict = yaml.load(f, Loader=yaml.FullLoader)
@@ -46,6 +32,10 @@ def yaml_to_dict(yaml_path):
         return init_tikv_replicas
 
 
+"""
+本函数以及下面的三个函数是parse_requests函数的组成部分，代表数据解析的四个部分
+本函数代表获取tikv msg的qps中的coprocessor部分
+"""
 def get_kv_cop(kv_grpc_msg_qps):
     res = []
     for data in kv_grpc_msg_qps:
@@ -57,6 +47,7 @@ def get_kv_cop(kv_grpc_msg_qps):
     return res
 
 
+"""本函数代表将得到的数据对每个tikv实例进行求和，因为我们使用的是总和进行预测"""
 def sum_up(statement_ops):
     res = []
     for data in statement_ops:
@@ -69,6 +60,7 @@ def sum_up(statement_ops):
     return res
 
 
+"""本函数的作用是确定负载中每种类型的命令所占比例"""
 def determine_workload_proportion(statement_ops, sum_data, kv_cop):
     proportions = []
     for i in range(len(statement_ops)):
@@ -81,6 +73,9 @@ def determine_workload_proportion(statement_ops, sum_data, kv_cop):
             elif metric['metric']['type'] == 'Insert':
                 proportion[3] = float(metric['values'][-1][1]) / sum_data[i][0]
             elif metric['metric']['type'] == 'Select':
+                # 由于read命令和scan命令在ops上的体现都是select，所以我结合tikv msg的qps来确定比例
+                # scan命令会独一无二地产生一种名为coprocessor的tikv msg，并且这个tikv msg的qps和scan的ops成正比
+                # 所以知道coprocessor的qps即可知道scan的ops，从而知道read的ops
                 scan_qps = kv_cop[i] * scan_per_cop[scan_per_cop_level]
                 proportion[1] = float(scan_qps / sum_data[i][0])
                 proportion[0] = (float(metric['values'][-1][1]) - scan_qps) / sum_data[i][0]
@@ -90,11 +85,85 @@ def determine_workload_proportion(statement_ops, sum_data, kv_cop):
     return proportions
 
 
+"""
+本函数用于根据上述求得的比例以及每种命令的权重求出综合负载
+权重由其他组员通过另外的程序得到
+"""
 def cal_weights(sum_data, proportions, weight):
     for i in range(len(sum_data)):
         sum_data[i][0] = sum_data[i][0] * (proportions[i][0] * weight[0] + proportions[i][1] * weight[1] + proportions[i][2] *
                                            weight[2] + proportions[i][3] * weight[3])
     return sum_data
+
+
+"""本函数是对输入的requests数据进行解析，使其符合神经网络训练的数据结构"""
+def parse_requests(statement_ops, kv_grpc_msg_qps):
+    kv_cop = get_kv_cop(kv_grpc_msg_qps)
+    sum_data = sum_up(statement_ops)
+    proportions = determine_workload_proportion(statement_ops, sum_data, kv_cop)
+    new_input_data = cal_weights(sum_data, proportions, weight)
+    return new_input_data
+
+
+"""
+本函数以及下面三个函数是函数parse_predict的组成成分，代表parse_predict的四个部分
+本函数以及下面三个函数的作用与上述的parse_requests的四个组成成分函数类似
+"""
+def get_kv_cop_predict(kv_grpc_msg_qps):
+    length = len(kv_grpc_msg_qps[0]['values'])
+    sum = [0. for _ in range(length)]
+    for metric in kv_grpc_msg_qps:
+        if metric['metric']['type'] == 'coprocessor':
+            for i in range(len(metric['values'])):
+                sum[i] += float(metric['values'][i][1])
+    return sum
+
+
+def sum_up_predict(statement_ops):
+    length = len(statement_ops[0]['values'])
+    sum = [0. for _ in range(length)]
+    for metric in statement_ops:
+        if metric['metric']['type'] != 'use':
+            for i in range(len(metric['values'])):
+                sum[i] += float(metric['values'][i][1])
+    return sum
+
+
+def determine_workload_proportion_predict(statement_ops, sum_data, kv_cop):
+    length = len(statement_ops[0]['values'])
+    proportions = [[0., 0., 0., 0.] for _ in range(length)]
+    for metric in statement_ops:
+        for i in range(len(metric['values'])):
+            if sum_data[i] == 0.:
+                continue
+            if metric['metric']['type'] == 'Update':
+                proportions[i][2] = float(metric['values'][i][1]) / sum_data[i]
+            elif metric['metric']['type'] == 'Insert':
+                proportions[i][3] = float(metric['values'][i][1]) / sum_data[i]
+            elif metric['metric']['type'] == 'Select':
+                scan_ops = kv_cop[i] * scan_per_cop[scan_per_cop_level]
+                proportions[i][1] = scan_ops / sum_data[i]
+                proportions[i][0] = (float(metric['values'][i][1]) - scan_ops) / sum_data[i]
+    return proportions
+
+
+def cal_weights_predict(sum_data, proportions, weight):
+    for i in range(len(sum_data)):
+        sum_data[i] = sum_data[i] * (proportions[i][0] * weight[0] + proportions[i][1] * weight[1] + proportions[i][2] *
+                                     weight[2] + proportions[i][3] * weight[3])
+    return sum_data
+
+
+"""
+本函数和上述parse_requests作用类似，但是是作用于预测部分的输入的
+预测部分的输入和训练部分的输入数据结构稍有不同，所以要用两种函数来写
+"""
+def parse_predict(statement_ops, kv_grpc_msg_qps):
+    kv_cop = get_kv_cop(kv_grpc_msg_qps)
+    sum_data = sum_up(statement_ops)
+    proportions = determine_workload_proportion(statement_ops, sum_data, kv_cop)
+    new_input_data = cal_weights(sum_data, proportions, weight)
+    return new_input_data
 
 
 # 获取训练集
@@ -130,7 +199,7 @@ def get_test_data():
         start = str(int(time.time()) - (predict_step + time_step - 2 - i) * 60)
         statement_ops = fetch_statement_ops(start, end, 60)
         kv_grpc_msg_qps = fetch_kv_grpc_msg_qps(start, end, 60)
-        sum_data = parse(statement_ops, kv_grpc_msg_qps)
+        sum_data = parse_predict(statement_ops, kv_grpc_msg_qps)
         res = []
         for input_data in sum_data:
             data = [input_data]
@@ -150,7 +219,7 @@ def get_test_y():
     start = end
     statement_ops = fetch_statement_ops(start, end, 60)
     kv_grpc_msg_qps = fetch_kv_grpc_msg_qps(start, end, 60)
-    test_y = parse(statement_ops, kv_grpc_msg_qps)
+    test_y = parse_predict(statement_ops, kv_grpc_msg_qps)
     test_y = np.array(test_y)
     normalized_test_y = (test_y - np.mean(test_y, axis=0)) / np.std(test_y, axis=0)
     normalized_test_y = normalized_test_y.tolist()
