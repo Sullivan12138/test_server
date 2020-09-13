@@ -3,13 +3,13 @@
 import os
 import sys
 import threading as td
-from test_server import predict
+from test_server import train
 
 
 def main():
     try:
         
-        t2 = td.Thread(target=predict.start_predict,
+        t2 = td.Thread(target=train.start_predict,
                        args=(sys.argv[-3], sys.argv[-2], sys.argv[-1]))
         t2.start()
         # t3 = td.Thread(target=predict_tidb.start_predict_cpu, args=())
