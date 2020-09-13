@@ -299,4 +299,5 @@ def start_predict(name, namespace, predict_duration):
 
 
 if __name__ == "__main__":
+    tf.reset_default_graph()
     start_predict("st-2", "pd-team-s2", "180")
